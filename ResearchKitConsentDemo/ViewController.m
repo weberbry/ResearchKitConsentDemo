@@ -26,15 +26,12 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
-    //Step 1: Create a ORKConsentDocument
     NSArray *sectionDataParsedFromInputFile = [self parseConsentDateFromInputFile];
     NSArray *sections = [self createConsentSectionsFromSectionData:sectionDataParsedFromInputFile];
     [self createConsentDocumentWithSection:sections];
     
-    //Step 2: Create a ORKOrderedTask
     ORKOrderedTask *orderedTask = [self configureTask];
     
-    //Step 3: Configuring a ORKTaskViewController based on the ORKOrderedTask
     ORKTaskViewController *taskViewController = [[ORKTaskViewController alloc] init];
     taskViewController.task = orderedTask;
     taskViewController.delegate = self;
@@ -59,7 +56,30 @@
         ORKConsentSection *consentSection = [self createConsentSectionFromConsentData:section];
         [consentSections addObject:consentSection];
     }
+    
+    [consentSections insertObject:[self introSection] atIndex:0];
+    [consentSections addObject:[self closingSection]];
+    
     return consentSections;
+}
+
+// This method creates a ORKConsentSection with introduction language that will not be displayed during the Visual Consent Step.
+// This language will only appear in the review document screen and the resulting PDF.
+- (ORKConsentSection *)introSection {
+    ORKConsentSection *section = [[ORKConsentSection alloc] initWithType:ORKConsentSectionTypeOnlyInDocument];
+    section.title = @"Intro Language";
+    section.htmlContent = @"This will only be shown in the consent document because this sectionType is map to ORKConsentSectionTypeOnlyInDocument. A consent document can include many sections with type ORKConsentSectionTypeOnlyInDocument. In this document there is a ORKConsentSectionTypeOnlyInDocument section as an intro and one as a closing section";
+    return section;
+}
+
+
+// This method creates a ORKConsentSection with introduction language that will not be displayed during the Visual Consent Step.
+// This language will only appear in the review document screen and the resulting PDF.
+- (ORKConsentSection *)closingSection {
+    ORKConsentSection *section = [[ORKConsentSection alloc] initWithType:ORKConsentSectionTypeOnlyInDocument];
+    section.title = @"Additional Terms";
+    section.htmlContent = @"Adding a ORKConsentSectionTypeOnlyInDocument at the end of a consent can be helpful to include any additional legal or related information.";
+    return section;
 }
 
 // This method creates a ORKConsentSection from each provided dictionary
